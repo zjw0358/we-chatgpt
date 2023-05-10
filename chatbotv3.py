@@ -26,13 +26,14 @@ class Chatbot:
     def __init__(
         self,
         api_key: str,
+        api_url: str,
         engine: str = None,
         proxy: str = None,
         max_tokens: int = 3000,
         temperature: float = 0.5,
         top_p: float = 1.0,
         reply_count: int = 1,
-        system_prompt: str = "你是全能助手小h，善于解决一切问题",
+        system_prompt: str = "你是全能助手大有，善于解决一切问题",
     ) -> None:
         """
         Initialize Chatbot with API key (from https://platform.openai.com/account/api-keys)
@@ -40,6 +41,7 @@ class Chatbot:
         self.engine = engine or ENGINE
         self.session = requests.Session()
         self.api_key = api_key
+        self.api_url = api_url
         self.proxy = proxy
         if self.proxy:
             proxies = {
@@ -104,7 +106,7 @@ class Chatbot:
         self.__truncate_conversation(convo_id=convo_id)
         # Get response
         response = self.session.post(
-            "https://api.openai.com/v1/chat/completions",
+            self.api_url,
             headers={"Authorization": f"Bearer {kwargs.get('api_key', self.api_key)}"},
             json={
                 "model": self.engine,

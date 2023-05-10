@@ -8,19 +8,21 @@ from chatbotv3 import Chatbot
 
 os.environ['GPT_ENGINE'] = 'gpt-3.5-turbo'
 api_key = os.environ.get('API_KEY')
-chatbot = Chatbot(api_key=api_key)
+api_url = os.environ.get('API_URL')
+chatbot = Chatbot(api_key=api_key, api_url=api_url)
 
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     return 'hello world！'
 
 
-@app.route('/wechat',methods=['GET','POST'])
+@app.route('/wechat', methods=['GET', 'POST'])
 def wechat():
-    if request.method =='GET':
+    if request.method == 'GET':
         # 设置token,开发者配置中心使用
         token = 'hsuheinrich003'
 
@@ -48,7 +50,7 @@ def wechat():
         xml = request.data
         try:
             # 把xml格式的数据进行处理，转换成字典进行取值
-            req = xmltodict.parse(xml)['xml'] # 云端调试空内容报错解决：no element found
+            req = xmltodict.parse(xml)['xml']  # 云端调试空内容报错解决：no element found
         except:
             return 'no element', 200
 
@@ -57,24 +59,24 @@ def wechat():
             # 获取用户的信息，开始构造返回数据
             try:
                 resp = {
-                    'ToUserName':req.get('FromUserName'),
-                    'FromUserName':req.get('ToUserName'),
-                    'CreateTime':int(time.time()),
-                    'MsgType':'text',
-                    'Content':chatbot.ask(req.get('Content'))
+                    'ToUserName': req.get('FromUserName'),
+                    'FromUserName': req.get('ToUserName'),
+                    'CreateTime': int(time.time()),
+                    'MsgType': 'text',
+                    'Content': chatbot.ask(req.get('Content'))
                 }
                 # 把构造的字典转换成xml格式
-                xml = xmltodict.unparse({'xml':resp})
+                xml = xmltodict.unparse({'xml': resp})
                 return xml
             except:
                 resp = {
-                    'ToUserName':req.get('FromUserName'),
-                    'FromUserName':req.get('ToUserName'),
-                    'CreateTime':int(time.time()),
-                    'MsgType':'text',
-                    'Content':'好像发生了点问题，请稍后再重新提问～'
+                    'ToUserName': req.get('FromUserName'),
+                    'FromUserName': req.get('ToUserName'),
+                    'CreateTime': int(time.time()),
+                    'MsgType': 'text',
+                    'Content': '好像发生了点问题，请稍后再重新提问～'
                 }
-                xml = xmltodict.unparse({'xml':resp})
+                xml = xmltodict.unparse({'xml': resp})
                 return xml
         else:
             resp = {
@@ -84,7 +86,7 @@ def wechat():
                 'MsgType': 'text',
                 'Content': '目前仅支持文本消息～'
             }
-            xml = xmltodict.unparse({'xml':resp})
+            xml = xmltodict.unparse({'xml': resp})
             return xml
 
 
